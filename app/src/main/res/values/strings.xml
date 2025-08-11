@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Silent Timer</string>
+    <string name="start">Start</string>
+    <string name="hours_content_description">Hours</string>
+    <string name="minutes_content_description">Minutes</string>
+    <string name="seconds_content_description">Seconds</string>
 </resources>
