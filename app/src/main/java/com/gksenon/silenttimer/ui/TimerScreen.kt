@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -55,7 +56,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
             onStopButtonClicked = viewModel::onStopButtonClicked
         )
 
-        is TimerViewModel.State.Ringing -> TimerRingingScreen()
+        is TimerViewModel.State.Ringing -> TimerRingingScreen(viewModel::onMuteButtonClicked)
     }
 }
 
@@ -200,12 +201,27 @@ fun TimerInProgressScreen(
 }
 
 @Composable
-fun TimerRingingScreen() {
-    val timerRingingBoxContentDescription = stringResource(R.string.timer_ringing_indicator)
-    Box(
+fun TimerRingingScreen(onMuteButtonClicked: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.primary)
-            .semantics { contentDescription = timerRingingBoxContentDescription }
-    )
+            .padding(32.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = stringResource(R.string.time_ran_out),
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+        ElevatedButton(
+            onClick = onMuteButtonClicked,
+            modifier = Modifier.fillMaxWidth()
+        ) { Text(text = stringResource(R.string.mute)) }
+    }
 }

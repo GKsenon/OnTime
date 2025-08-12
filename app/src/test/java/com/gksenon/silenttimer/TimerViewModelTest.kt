@@ -3,22 +3,16 @@ package com.gksenon.silenttimer
 import com.gksenon.silenttimer.viewmodel.TimerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -110,6 +104,16 @@ class TimerViewModelTest {
         viewModel.onStartButtonClicked()
         advanceTimeBy(1500L)
         viewModel.onStopButtonClicked()
+        advanceUntilIdle()
+        assert(viewModel.state.value is TimerViewModel.State.Init)
+    }
+
+    @Test
+    fun onMuteButtonClicked_resetsStateToInit() = runTest {
+        viewModel.onSecondsChanged("1")
+        viewModel.onStartButtonClicked()
+        advanceTimeBy(2.seconds)
+        viewModel.onMuteButtonClicked()
         advanceUntilIdle()
         assert(viewModel.state.value is TimerViewModel.State.Init)
     }

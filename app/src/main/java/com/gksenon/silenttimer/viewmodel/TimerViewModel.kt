@@ -57,6 +57,10 @@ class TimerViewModel : ViewModel() {
         }
     }
 
+    fun onMuteButtonClicked() {
+        _state.value = State.Init()
+    }
+
     private fun ticker(duration: Duration) = flow {
         repeat(duration.inWholeSeconds.toInt()) {
             delay(1000L)

@@ -1,8 +1,6 @@
 package com.gksenon.silenttimer
 
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -43,7 +41,8 @@ class TimerScreenTest {
     private lateinit var secondsContentDescription: String
     private lateinit var startButtonContentDescription: String
     private lateinit var stopButtonContentDescription: String
-    private lateinit var ringingIndicatorContentDescription: String
+    private lateinit var timeRanOutText: String
+    private lateinit var muteButtonText: String
 
     @Before
     fun init() {
@@ -54,7 +53,8 @@ class TimerScreenTest {
                 secondsContentDescription = stringResource(R.string.seconds_content_description)
                 startButtonContentDescription = stringResource(R.string.start)
                 stopButtonContentDescription = stringResource(R.string.stop)
-                ringingIndicatorContentDescription = stringResource(R.string.timer_ringing_indicator)
+                timeRanOutText = stringResource(R.string.time_ran_out)
+                muteButtonText = stringResource(R.string.mute)
                 TimerScreen(viewModel = viewModel)
             }
         }
@@ -117,8 +117,17 @@ class TimerScreenTest {
     }
 
     @Test
-    fun onTimerRinging_showsColoredScreen() {
+    fun onTimerRinging_showsIndicator() {
         timerState.value = TimerViewModel.State.Ringing
-        rule.onNodeWithContentDescription(ringingIndicatorContentDescription).assertIsDisplayed()
+        rule.onNodeWithText(timeRanOutText).assertIsDisplayed()
+        rule.onNodeWithText(muteButtonText).assertIsDisplayed()
+    }
+
+    @Test
+    fun onMuteButtonClicked_resetsTimer() {
+        every { viewModel.onMuteButtonClicked() } returns Unit
+        timerState.value = TimerViewModel.State.Ringing
+        rule.onNodeWithText(muteButtonText).performClick()
+        verify { viewModel.onMuteButtonClicked() }
     }
 }

@@ -5,5 +5,6 @@
     <string name="minutes_content_description">Minutes</string>
     <string name="seconds_content_description">Seconds</string>
     <string name="stop">Stop</string>
-    <string name="timer_ringing_indicator">Timer ringing indicator</string>
+    <string name="mute">Mute</string>
+    <string name="time_ran_out">Time ran out</string>
 </resources>
