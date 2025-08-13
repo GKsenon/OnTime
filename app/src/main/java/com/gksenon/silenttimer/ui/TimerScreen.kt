@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,7 +55,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
 
     val activity = LocalContext.current as Activity
     LaunchedEffect(state.keepScreenOn) {
-        if(state.keepScreenOn)
+        if (state.keepScreenOn)
             activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         else
             activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -181,26 +180,33 @@ fun TimerInProgressScreen(
 
 @Composable
 fun TimerRingingScreen(onMuteButtonClicked: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary)
-            .padding(32.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.weight(1f)
+    Scaffold { innerPadding ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.primary)
+                .padding(
+                    top = innerPadding.calculateTopPadding() + 32.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 32.dp,
+                    start = 32.dp,
+                    end = 32.dp
+                )
         ) {
-            Text(
-                text = stringResource(R.string.time_ran_out),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = stringResource(R.string.time_ran_out),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+            ElevatedButton(
+                onClick = onMuteButtonClicked,
+                modifier = Modifier.fillMaxWidth()
+            ) { Text(text = stringResource(R.string.mute)) }
         }
-        ElevatedButton(
-            onClick = onMuteButtonClicked,
-            modifier = Modifier.fillMaxWidth()
-        ) { Text(text = stringResource(R.string.mute)) }
     }
 }
