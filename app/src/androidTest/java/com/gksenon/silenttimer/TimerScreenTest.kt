@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.gksenon.silenttimer.ui.TimerScreen
 import com.gksenon.silenttimer.ui.theme.SilentTimerTheme
@@ -31,7 +31,7 @@ class TimerScreenTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val timerState = MutableStateFlow<TimerViewModel.State>(TimerViewModel.State.Init())
+    private val timerState = MutableStateFlow<TimerViewModel.State>(TimerViewModel.State.Init)
     private val viewModel = mockk<TimerViewModel> {
         every { state } returns timerState
     }
@@ -68,37 +68,31 @@ class TimerScreenTest {
     }
 
     @Test
-    fun onHoursChanged_sendsUpdateToViewModel() {
-        val hoursSlot = slot<String>()
-        every { viewModel.onHoursChanged(capture(hoursSlot)) } returns Unit
-
-        rule.onNodeWithContentDescription(hoursContentDescription).performTextReplacement("5")
-        assertEquals("5", hoursSlot.captured)
-    }
-
-    @Test
-    fun onMinutesChanged_sendsUpdateToViewModel() {
-        val minutesSlot = slot<String>()
-        every { viewModel.onMinutesChanged(capture(minutesSlot)) } returns Unit
-
-        rule.onNodeWithContentDescription(minutesContentDescription).performTextReplacement("25")
-        assertEquals("25", minutesSlot.captured)
-    }
-
-    @Test
-    fun onSecondsChanged_sendsUpdateToViewModel() {
-        val secondsSlot = slot<String>()
-        every { viewModel.onSecondsChanged(capture(secondsSlot)) } returns Unit
-
-        rule.onNodeWithContentDescription(secondsContentDescription).performTextReplacement("25")
-        assertEquals("25", secondsSlot.captured)
-    }
-
-    @Test
     fun onStartButtonClicked_startsTimer() {
-        every { viewModel.onStartButtonClicked() } returns Unit
+        val hoursSlot = slot<Int>()
+        val minutesSlot = slot<Int>()
+        val secondsSlot = slot<Int>()
+        every {
+            viewModel.onStartButtonClicked(
+                capture(hoursSlot),
+                capture(minutesSlot),
+                capture(secondsSlot)
+            )
+        } returns Unit
+
+        val hours = 1
+        val minutes = 3
+        val seconds = 5
+        rule.onNodeWithContentDescription(hoursContentDescription)
+            .performScrollToIndex(getScrollPosition(24, hours))
+        rule.onNodeWithContentDescription(minutesContentDescription)
+            .performScrollToIndex(getScrollPosition(60, minutes))
+        rule.onNodeWithContentDescription(secondsContentDescription)
+            .performScrollToIndex(getScrollPosition(60, seconds))
         rule.onNodeWithContentDescription(startButtonContentDescription).performClick()
-        verify { viewModel.onStartButtonClicked() }
+        assertEquals(hours, hoursSlot.captured)
+        assertEquals(minutes, minutesSlot.captured)
+        assertEquals(seconds, secondsSlot.captured)
     }
 
     @Test
@@ -130,4 +124,7 @@ class TimerScreenTest {
         rule.onNodeWithText(muteButtonText).performClick()
         verify { viewModel.onMuteButtonClicked() }
     }
+
+    private fun getScrollPosition(max: Int, index: Int) =
+        Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % max - 1 + index
 }

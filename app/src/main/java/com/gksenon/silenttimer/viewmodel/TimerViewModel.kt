@@ -18,28 +18,12 @@ class TimerViewModel : ViewModel() {
 
     private var tickerJob: Job? = null
 
-    private val _state = MutableStateFlow<State>(State.Init())
+    private val _state = MutableStateFlow<State>(State.Init)
 
     val state = _state.asStateFlow()
 
-    fun onHoursChanged(input: String) {
-        val state = _state.value as State.Init
-        _state.value = state.copy(hours = validateDurationInput(input, 0..23))
-    }
-
-    fun onMinutesChanged(input: String) {
-        val state = _state.value as State.Init
-        _state.value = state.copy(minutes = validateDurationInput(input, 0..59))
-    }
-
-    fun onSecondsChanged(input: String) {
-        val state = _state.value as State.Init
-        _state.value = state.copy(seconds = validateDurationInput(input, 0..59))
-    }
-
-    fun onStartButtonClicked() {
-        val state = _state.value as State.Init
-        val duration = state.hours.hours + state.minutes.minutes + state.seconds.seconds
+    fun onStartButtonClicked(hours: Int, minutes: Int, seconds: Int) {
+        val duration = hours.hours + minutes.minutes + seconds.seconds
         _state.value = State.InProgress(remainingTime = duration)
         tickerJob = viewModelScope.launch {
             ticker(duration).collect {
@@ -53,12 +37,12 @@ class TimerViewModel : ViewModel() {
     fun onStopButtonClicked() {
         viewModelScope.launch {
             tickerJob?.cancelAndJoin()
-            _state.value = State.Init()
+            _state.value = State.Init
         }
     }
 
     fun onMuteButtonClicked() {
-        _state.value = State.Init()
+        _state.value = State.Init
     }
 
     private fun ticker(duration: Duration) = flow {
@@ -68,12 +52,9 @@ class TimerViewModel : ViewModel() {
         }
     }
 
-    private fun validateDurationInput(input: String, range: IntRange) =
-        input.filter { it.isDigit() }.toIntOrNull()?.coerceIn(range) ?: 0
-
     sealed class State {
 
-        data class Init(val hours: Int = 0, val minutes: Int = 0, val seconds: Int = 0) : State()
+        object Init : State()
 
         data class InProgress(val remainingTime: Duration) : State()
 

@@ -34,48 +34,12 @@ class TimerViewModelTest {
 
     @Test
     fun init_showsDefaultValue() = runTest {
-        val state = viewModel.state.value as TimerViewModel.State.Init
-        assertEquals(0, state.hours)
-        assertEquals(0, state.minutes)
-        assertEquals(0, state.seconds)
-    }
-
-    @Test
-    fun onHoursChanged_validatesHoursAndUpdatesState() = runTest {
-        viewModel.onHoursChanged("-8")
-        assertEquals(8, (viewModel.state.value as TimerViewModel.State.Init).hours)
-        viewModel.onHoursChanged("2abs-=,.1")
-        assertEquals(21, (viewModel.state.value as TimerViewModel.State.Init).hours)
-        viewModel.onHoursChanged("45")
-        assertEquals(23, (viewModel.state.value as TimerViewModel.State.Init).hours)
-    }
-
-    @Test
-    fun onMinutesChanged_validatesMinutesAndUpdatesState() = runTest {
-        viewModel.onMinutesChanged("-8")
-        assertEquals(8, (viewModel.state.value as TimerViewModel.State.Init).minutes)
-        viewModel.onMinutesChanged("2abs-=,.1")
-        assertEquals(21, (viewModel.state.value as TimerViewModel.State.Init).minutes)
-        viewModel.onMinutesChanged("120")
-        assertEquals(59, (viewModel.state.value as TimerViewModel.State.Init).minutes)
-    }
-
-    @Test
-    fun onSecondsChanged_validatesSecondsAndUpdatesState() = runTest {
-        viewModel.onSecondsChanged("-8")
-        assertEquals(8, (viewModel.state.value as TimerViewModel.State.Init).seconds)
-        viewModel.onSecondsChanged("2abs-=,.1")
-        assertEquals(21, (viewModel.state.value as TimerViewModel.State.Init).seconds)
-        viewModel.onSecondsChanged("112")
-        assertEquals(59, (viewModel.state.value as TimerViewModel.State.Init).seconds)
+        assert(viewModel.state.value is TimerViewModel.State.Init)
     }
 
     @Test
     fun onStartButtonClicked_startsTimer() = runTest {
-        viewModel.onHoursChanged("1")
-        viewModel.onMinutesChanged("3")
-        viewModel.onSecondsChanged("5")
-        viewModel.onStartButtonClicked()
+        viewModel.onStartButtonClicked(hours = 1, minutes = 3, seconds = 5)
 
         val duration = 1.hours + 3.minutes + 5.seconds
         assertEquals(
@@ -84,13 +48,15 @@ class TimerViewModelTest {
         )
 
         advanceTimeBy(1500L)
-        assertEquals(duration - 1.seconds, (viewModel.state.value as TimerViewModel.State.InProgress).remainingTime)
+        assertEquals(
+            duration - 1.seconds,
+            (viewModel.state.value as TimerViewModel.State.InProgress).remainingTime
+        )
     }
 
     @Test
     fun onTimeRanOut_startsRinging() = runTest {
-        viewModel.onSecondsChanged("5")
-        viewModel.onStartButtonClicked()
+        viewModel.onStartButtonClicked(hours = 0, minutes = 0, seconds = 5)
 
         assert(viewModel.state.value is TimerViewModel.State.InProgress)
 
@@ -100,8 +66,7 @@ class TimerViewModelTest {
 
     @Test
     fun onStopButtonClicked_stopsTimer() = runTest {
-        viewModel.onSecondsChanged("5")
-        viewModel.onStartButtonClicked()
+        viewModel.onStartButtonClicked(hours = 0, minutes = 0, seconds = 5)
         advanceTimeBy(1500L)
         viewModel.onStopButtonClicked()
         advanceUntilIdle()
@@ -110,8 +75,7 @@ class TimerViewModelTest {
 
     @Test
     fun onMuteButtonClicked_resetsStateToInit() = runTest {
-        viewModel.onSecondsChanged("1")
-        viewModel.onStartButtonClicked()
+        viewModel.onStartButtonClicked(hours = 0, minutes = 0, seconds = 1)
         advanceTimeBy(2.seconds)
         viewModel.onMuteButtonClicked()
         advanceUntilIdle()

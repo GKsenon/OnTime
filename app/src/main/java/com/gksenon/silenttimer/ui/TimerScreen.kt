@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ElevatedButton
@@ -20,21 +18,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gksenon.silenttimer.R
 import com.gksenon.silenttimer.viewmodel.TimerViewModel
@@ -43,13 +39,7 @@ import com.gksenon.silenttimer.viewmodel.TimerViewModel
 fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
     val state by viewModel.state.collectAsState()
     when (state) {
-        is TimerViewModel.State.Init -> TimerInitScreen(
-            state = state as TimerViewModel.State.Init,
-            onHoursChanged = viewModel::onHoursChanged,
-            onMinutesChanged = viewModel::onMinutesChanged,
-            onSecondsChanged = viewModel::onSecondsChanged,
-            onStartButtonClicked = viewModel::onStartButtonClicked
-        )
+        is TimerViewModel.State.Init -> TimerInitScreen(viewModel::onStartButtonClicked)
 
         is TimerViewModel.State.InProgress -> TimerInProgressScreen(
             state = state as TimerViewModel.State.InProgress,
@@ -62,13 +52,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimerInitScreen(
-    state: TimerViewModel.State.Init,
-    onHoursChanged: (String) -> Unit,
-    onMinutesChanged: (String) -> Unit,
-    onSecondsChanged: (String) -> Unit,
-    onStartButtonClicked: () -> Unit
-) {
+fun TimerInitScreen(onStartButtonClicked: (Int, Int, Int) -> Unit) {
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = stringResource(R.string.app_name)) })
     }
@@ -83,6 +67,9 @@ fun TimerInitScreen(
                     bottom = innerPadding.calculateBottomPadding() + 32.dp
                 )
         ) {
+            val hoursPickerState = remember { NumberPickerState() }
+            val minutesPickerState = remember { NumberPickerState() }
+            val secondsPickerState = remember { NumberPickerState() }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(
                     space = 8.dp,
@@ -91,57 +78,36 @@ fun TimerInitScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                val textFieldColors = TextFieldDefaults.colors().copy(
-                    focusedContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    errorIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-                val hours = if (state.hours > 0) state.hours.toString() else ""
                 val hoursContentDescription = stringResource(R.string.hours_content_description)
-                TextField(
-                    value = hours,
-                    onValueChange = onHoursChanged,
-                    placeholder = { Text(text = "00") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = textFieldColors,
-                    modifier = Modifier
-                        .width(64.dp)
-                        .semantics { contentDescription = hoursContentDescription }
+                NumberPicker(
+                    numbers = (0..23).toList(),
+                    state = hoursPickerState,
+                    modifier = Modifier.semantics { contentDescription = hoursContentDescription }
                 )
-                Text(text = ":")
-                val minutes = if (state.minutes > 0) state.minutes.toString() else ""
+                Text(text = ":", fontSize = 32.sp)
                 val minutesContentDescription = stringResource(R.string.minutes_content_description)
-                TextField(
-                    value = minutes,
-                    onValueChange = onMinutesChanged,
-                    placeholder = { Text(text = "00") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = textFieldColors,
-                    modifier = Modifier
-                        .width(64.dp)
-                        .semantics { contentDescription = minutesContentDescription }
+                NumberPicker(
+                    numbers = (0..59).toList(),
+                    state = minutesPickerState,
+                    modifier = Modifier.semantics { contentDescription = minutesContentDescription }
                 )
-                Text(text = ":")
-                val seconds = if (state.seconds > 0) state.seconds.toString() else ""
+                Text(text = ":", fontSize = 32.sp)
                 val secondsContentDescription = stringResource(R.string.seconds_content_description)
-                TextField(
-                    value = seconds,
-                    onValueChange = onSecondsChanged,
-                    placeholder = { Text(text = "00") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = textFieldColors,
-                    modifier = Modifier
-                        .width(64.dp)
-                        .semantics { contentDescription = secondsContentDescription }
+                NumberPicker(
+                    numbers = (0..59).toList(),
+                    state = secondsPickerState,
+                    modifier = Modifier.semantics { contentDescription = secondsContentDescription }
                 )
             }
             FilledIconButton(
-                onClick = onStartButtonClicked,
+                onClick = {
+                    println("${hoursPickerState.selectedItem},${minutesPickerState.selectedItem}, ${secondsPickerState.selectedItem}")
+                    onStartButtonClicked(
+                        hoursPickerState.selectedItem,
+                        minutesPickerState.selectedItem,
+                        secondsPickerState.selectedItem
+                    )
+                },
                 modifier = Modifier.size(64.dp)
             ) {
                 Icon(
