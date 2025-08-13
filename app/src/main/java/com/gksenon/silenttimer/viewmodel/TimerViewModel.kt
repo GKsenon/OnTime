@@ -52,12 +52,12 @@ class TimerViewModel : ViewModel() {
         }
     }
 
-    sealed class State {
+    sealed class State(val keepScreenOn: Boolean) {
 
-        object Init : State()
+        object Init : State(keepScreenOn = false)
 
-        data class InProgress(val remainingTime: Duration) : State()
+        data class InProgress(val remainingTime: Duration) : State(keepScreenOn = true)
 
-        object Ringing : State()
+        object Ringing : State(keepScreenOn = true)
     }
 }

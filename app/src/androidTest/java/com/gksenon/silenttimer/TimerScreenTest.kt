@@ -1,5 +1,9 @@
 package com.gksenon.silenttimer
 
+import android.app.Activity
+import android.view.Window
+import android.view.WindowManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -43,6 +47,7 @@ class TimerScreenTest {
     private lateinit var stopButtonContentDescription: String
     private lateinit var timeRanOutText: String
     private lateinit var muteButtonText: String
+    private lateinit var windowManager: Window
 
     @Before
     fun init() {
@@ -55,6 +60,7 @@ class TimerScreenTest {
                 stopButtonContentDescription = stringResource(R.string.stop)
                 timeRanOutText = stringResource(R.string.time_ran_out)
                 muteButtonText = stringResource(R.string.mute)
+                windowManager = (LocalContext.current as Activity).window
                 TimerScreen(viewModel = viewModel)
             }
         }
@@ -65,6 +71,7 @@ class TimerScreenTest {
         rule.onNodeWithContentDescription(hoursContentDescription).assertIsDisplayed()
         rule.onNodeWithContentDescription(minutesContentDescription).assertIsDisplayed()
         rule.onNodeWithContentDescription(secondsContentDescription).assertIsDisplayed()
+        assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) == 0)
     }
 
     @Test
@@ -100,6 +107,7 @@ class TimerScreenTest {
         timerState.value = TimerViewModel.State.InProgress(1.hours + 30.minutes + 5.seconds)
         rule.onNodeWithText("01:30:05").assertIsDisplayed()
         rule.onNodeWithContentDescription(stopButtonContentDescription).assertIsDisplayed()
+        assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0)
     }
 
     @Test
@@ -115,6 +123,7 @@ class TimerScreenTest {
         timerState.value = TimerViewModel.State.Ringing
         rule.onNodeWithText(timeRanOutText).assertIsDisplayed()
         rule.onNodeWithText(muteButtonText).assertIsDisplayed()
+        assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0)
     }
 
     @Test
