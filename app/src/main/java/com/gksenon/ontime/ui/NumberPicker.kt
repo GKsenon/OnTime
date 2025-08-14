@@ -1,4 +1,4 @@
-package com.gksenon.silenttimer.ui
+package com.gksenon.ontime.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior

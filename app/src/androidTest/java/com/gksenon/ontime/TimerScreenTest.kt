@@ -1,4 +1,4 @@
-package com.gksenon.silenttimer
+package com.gksenon.ontime
 
 import android.app.Activity
 import android.view.Window
@@ -12,9 +12,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.gksenon.silenttimer.ui.TimerScreen
-import com.gksenon.silenttimer.ui.theme.SilentTimerTheme
-import com.gksenon.silenttimer.viewmodel.TimerViewModel
+import com.gksenon.ontime.ui.TimerScreen
+import com.gksenon.ontime.ui.theme.OnTimeTheme
+import com.gksenon.ontime.viewmodel.TimerViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -52,7 +52,7 @@ class TimerScreenTest {
     @Before
     fun init() {
         rule.setContent {
-            SilentTimerTheme {
+            OnTimeTheme {
                 hoursContentDescription = stringResource(R.string.hours_content_description)
                 minutesContentDescription = stringResource(R.string.minutes_content_description)
                 secondsContentDescription = stringResource(R.string.seconds_content_description)

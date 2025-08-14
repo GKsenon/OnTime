@@ -1,6 +1,6 @@
-package com.gksenon.silenttimer
+package com.gksenon.ontime
 
-import com.gksenon.silenttimer.viewmodel.TimerViewModel
+import com.gksenon.ontime.viewmodel.TimerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher

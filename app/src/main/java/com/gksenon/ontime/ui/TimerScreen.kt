@@ -1,4 +1,4 @@
-package com.gksenon.silenttimer.ui
+package com.gksenon.ontime.ui
 
 import android.app.Activity
 import android.view.WindowManager
@@ -36,8 +36,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.gksenon.silenttimer.R
-import com.gksenon.silenttimer.viewmodel.TimerViewModel
+import com.gksenon.ontime.R
+import com.gksenon.ontime.viewmodel.TimerViewModel
 
 @Composable
 fun TimerScreen(viewModel: TimerViewModel = viewModel()) {

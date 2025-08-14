@@ -1,4 +1,4 @@
-package com.gksenon.silenttimer.viewmodel
+package com.gksenon.ontime.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

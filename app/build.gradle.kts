@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.gksenon.silenttimer"
+    namespace = "com.gksenon.ontime"
     compileSdk = 36
 
     defaultConfig {

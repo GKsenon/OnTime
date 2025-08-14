@@ -1,4 +1,4 @@
-package com.gksenon.silenttimer.ui.theme
+package com.gksenon.ontime.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

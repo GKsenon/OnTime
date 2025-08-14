@@ -1,11 +1,11 @@
-package com.gksenon.silenttimer
+package com.gksenon.ontime
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.gksenon.silenttimer.ui.TimerScreen
-import com.gksenon.silenttimer.ui.theme.SilentTimerTheme
+import com.gksenon.ontime.ui.TimerScreen
+import com.gksenon.ontime.ui.theme.OnTimeTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SilentTimerTheme {
+            OnTimeTheme {
                 TimerScreen()
             }
         }
