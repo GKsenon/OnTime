@@ -74,10 +74,10 @@ class TimerViewModelTest {
     }
 
     @Test
-    fun onMuteButtonClicked_resetsStateToInit() = runTest {
+    fun onTurnOffButtonClicked_resetsStateToInit() = runTest {
         viewModel.onStartButtonClicked(hours = 0, minutes = 0, seconds = 1)
         advanceTimeBy(2.seconds)
-        viewModel.onMuteButtonClicked()
+        viewModel.onTurnOffButtonClicked()
         advanceUntilIdle()
         assert(viewModel.state.value is TimerViewModel.State.Init)
     }

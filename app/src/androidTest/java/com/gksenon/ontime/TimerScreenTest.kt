@@ -46,7 +46,7 @@ class TimerScreenTest {
     private lateinit var startButtonContentDescription: String
     private lateinit var stopButtonContentDescription: String
     private lateinit var timeRanOutText: String
-    private lateinit var muteButtonText: String
+    private lateinit var turnOffButtonText: String
     private lateinit var windowManager: Window
 
     @Before
@@ -59,7 +59,7 @@ class TimerScreenTest {
                 startButtonContentDescription = stringResource(R.string.start)
                 stopButtonContentDescription = stringResource(R.string.stop)
                 timeRanOutText = stringResource(R.string.time_ran_out)
-                muteButtonText = stringResource(R.string.mute)
+                turnOffButtonText = stringResource(R.string.turn_off)
                 windowManager = (LocalContext.current as Activity).window
                 TimerScreen(viewModel = viewModel)
             }
@@ -122,16 +122,16 @@ class TimerScreenTest {
     fun onTimerRinging_showsIndicator() {
         timerState.value = TimerViewModel.State.Ringing
         rule.onNodeWithText(timeRanOutText).assertIsDisplayed()
-        rule.onNodeWithText(muteButtonText).assertIsDisplayed()
+        rule.onNodeWithText(turnOffButtonText).assertIsDisplayed()
         assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0)
     }
 
     @Test
-    fun onMuteButtonClicked_resetsTimer() {
-        every { viewModel.onMuteButtonClicked() } returns Unit
+    fun onTurnOffButtonClicked_resetsTimer() {
+        every { viewModel.onTurnOffButtonClicked() } returns Unit
         timerState.value = TimerViewModel.State.Ringing
-        rule.onNodeWithText(muteButtonText).performClick()
-        verify { viewModel.onMuteButtonClicked() }
+        rule.onNodeWithText(turnOffButtonText).performClick()
+        verify { viewModel.onTurnOffButtonClicked() }
     }
 
     private fun getScrollPosition(max: Int, index: Int) =

@@ -41,7 +41,7 @@ class TimerViewModel : ViewModel() {
         }
     }
 
-    fun onMuteButtonClicked() {
+    fun onTurnOffButtonClicked() {
         _state.value = State.Init
     }
 

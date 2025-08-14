@@ -50,7 +50,7 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
             onStopButtonClicked = viewModel::onStopButtonClicked
         )
 
-        is TimerViewModel.State.Ringing -> TimerRingingScreen(viewModel::onMuteButtonClicked)
+        is TimerViewModel.State.Ringing -> TimerRingingScreen(viewModel::onTurnOffButtonClicked)
     }
 
     val activity = LocalContext.current as Activity
@@ -179,7 +179,7 @@ fun TimerInProgressScreen(
 }
 
 @Composable
-fun TimerRingingScreen(onMuteButtonClicked: () -> Unit) {
+fun TimerRingingScreen(onTurnOffButtonClicked: () -> Unit) {
     Scaffold { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -204,9 +204,9 @@ fun TimerRingingScreen(onMuteButtonClicked: () -> Unit) {
                 )
             }
             ElevatedButton(
-                onClick = onMuteButtonClicked,
+                onClick = onTurnOffButtonClicked,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text(text = stringResource(R.string.mute)) }
+            ) { Text(text = stringResource(R.string.turn_off)) }
         }
     }
 }
