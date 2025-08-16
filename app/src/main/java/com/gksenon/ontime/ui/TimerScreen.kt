@@ -162,6 +162,7 @@ fun TimerInProgressScreen(
             ) {
                 Text(
                     text = remainingTime,
+                    fontSize = 36.sp,
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
