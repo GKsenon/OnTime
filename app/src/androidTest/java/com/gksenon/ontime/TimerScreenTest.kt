@@ -120,16 +120,17 @@ class TimerScreenTest {
 
     @Test
     fun onTimerRinging_showsIndicator() {
-        timerState.value = TimerViewModel.State.Ringing
+        timerState.value = TimerViewModel.State.Ringing(timePassed = 5.seconds)
         rule.onNodeWithText(timeRanOutText).assertIsDisplayed()
         rule.onNodeWithText(turnOffButtonText).assertIsDisplayed()
+        rule.onNodeWithText("-00:00:05").assertIsDisplayed()
         assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) != 0)
     }
 
     @Test
     fun onTurnOffButtonClicked_resetsTimer() {
         every { viewModel.onTurnOffButtonClicked() } returns Unit
-        timerState.value = TimerViewModel.State.Ringing
+        timerState.value = TimerViewModel.State.Ringing()
         rule.onNodeWithText(turnOffButtonText).performClick()
         verify { viewModel.onTurnOffButtonClicked() }
     }

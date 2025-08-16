@@ -50,7 +50,10 @@ fun TimerScreen(viewModel: TimerViewModel = viewModel()) {
             onStopButtonClicked = viewModel::onStopButtonClicked
         )
 
-        is TimerViewModel.State.Ringing -> TimerRingingScreen(viewModel::onTurnOffButtonClicked)
+        is TimerViewModel.State.Ringing -> TimerRingingScreen(
+            state = state as TimerViewModel.State.Ringing,
+            onTurnOffButtonClicked = viewModel::onTurnOffButtonClicked
+        )
     }
 
     val activity = LocalContext.current as Activity
@@ -180,7 +183,10 @@ fun TimerInProgressScreen(
 }
 
 @Composable
-fun TimerRingingScreen(onTurnOffButtonClicked: () -> Unit) {
+fun TimerRingingScreen(
+    state: TimerViewModel.State.Ringing,
+    onTurnOffButtonClicked: () -> Unit
+) {
     Scaffold { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -194,13 +200,23 @@ fun TimerRingingScreen(onTurnOffButtonClicked: () -> Unit) {
                     end = 32.dp
                 )
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = stringResource(R.string.time_ran_out),
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+                val formattedTimePassed =
+                    state.timePassed.toComponents { hours, minutes, seconds, _ ->
+                        "-%02d:%02d:%02d".format(hours, minutes, seconds)
+                    }
+                Text(
+                    text = formattedTimePassed,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }

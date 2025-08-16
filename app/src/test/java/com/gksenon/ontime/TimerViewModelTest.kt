@@ -52,6 +52,8 @@ class TimerViewModelTest {
             duration - 1.seconds,
             (viewModel.state.value as TimerViewModel.State.InProgress).remainingTime
         )
+
+        viewModel.onStopButtonClicked()
     }
 
     @Test
@@ -62,6 +64,27 @@ class TimerViewModelTest {
 
         advanceTimeBy(5500L)
         assert(viewModel.state.value is TimerViewModel.State.Ringing)
+
+        viewModel.onTurnOffButtonClicked()
+    }
+
+    @Test
+    fun onTimeRanOut_showsTimePassed() = runTest {
+        viewModel.onStartButtonClicked(hours = 0, minutes = 0, seconds = 2)
+        advanceTimeBy(2500L)
+        assert(viewModel.state.value is TimerViewModel.State.Ringing)
+        assertEquals(
+            0.seconds,
+            (viewModel.state.value as TimerViewModel.State.Ringing).timePassed
+        )
+
+        advanceTimeBy(1000L)
+        assertEquals(
+            1.seconds,
+            (viewModel.state.value as TimerViewModel.State.Ringing).timePassed
+        )
+
+        viewModel.onTurnOffButtonClicked()
     }
 
     @Test
