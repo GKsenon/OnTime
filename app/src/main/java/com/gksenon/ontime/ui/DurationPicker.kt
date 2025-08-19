@@ -2,7 +2,9 @@ package com.gksenon.ontime.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,10 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,16 +22,67 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gksenon.ontime.R
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlin.time.Duration
+
+@Composable
+fun DurationPicker(
+    duration: Duration,
+    onHoursChanged: (Int) -> Unit,
+    onMinutesChanged: (Int) -> Unit,
+    onSecondsChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(
+            space = 8.dp,
+            alignment = Alignment.CenterHorizontally
+        ),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        val (hours, minutes, seconds) = duration.toComponents { hours, minutes, seconds, _ ->
+            Triple(hours.toInt(), minutes, seconds)
+        }
+        val hoursContentDescription = stringResource(R.string.hours_content_description)
+        NumberPicker(
+            numbers = (0..23).toList(),
+            selectedNumber = hours,
+            onSelectedNumberChanged = onHoursChanged,
+            modifier = Modifier.semantics { contentDescription = hoursContentDescription }
+        )
+        Text(text = ":", fontSize = 32.sp)
+        val minutesContentDescription = stringResource(R.string.minutes_content_description)
+        NumberPicker(
+            numbers = (0..59).toList(),
+            selectedNumber = minutes,
+            onSelectedNumberChanged = onMinutesChanged,
+            modifier = Modifier.semantics { contentDescription = minutesContentDescription }
+        )
+        Text(text = ":", fontSize = 32.sp)
+        val secondsContentDescription = stringResource(R.string.seconds_content_description)
+        NumberPicker(
+            numbers = (0..59).toList(),
+            selectedNumber = seconds,
+            onSelectedNumberChanged = onSecondsChanged,
+            modifier = Modifier.semantics { contentDescription = secondsContentDescription }
+        )
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NumberPicker(
     numbers: List<Int>,
-    state: NumberPickerState,
+    selectedNumber: Int,
+    onSelectedNumberChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val visibleItemsMiddle = 1
@@ -53,12 +103,21 @@ fun NumberPicker(
         )
     }
 
+    LaunchedEffect(selectedNumber) {
+        val currentItemIndex = listState.firstVisibleItemIndex + visibleItemsMiddle
+        val currentItem = getItem(currentItemIndex)
+        if (currentItem != selectedNumber) {
+            val newItemIndex = currentItemIndex + (selectedNumber - currentItem)
+            listState.scrollToItem(newItemIndex - visibleItemsMiddle)
+        }
+    }
+
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .map { index -> getItem(index + visibleItemsMiddle) }
             .distinctUntilChanged()
             .collect { item ->
-                state.selectedItem = item
+                onSelectedNumberChanged(item)
             }
     }
 
@@ -93,7 +152,3 @@ private fun Modifier.fadingEdge(brush: Brush) = this
         drawContent()
         drawRect(brush = brush, blendMode = BlendMode.DstIn)
     }
-
-class NumberPickerState {
-    var selectedItem by mutableIntStateOf(0)
-}
