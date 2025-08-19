@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -98,38 +99,52 @@ fun TimerInitScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
             )
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 32.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp)
-            ) {
-                items(state.presets) { preset ->
-                    val backgroundColor =
-                        if (state.selectedPresetId == preset.id) MaterialTheme.colorScheme.surface
-                        else MaterialTheme.colorScheme.surfaceDim
-                    val borderColor =
-                        if (state.selectedPresetId == preset.id) MaterialTheme.colorScheme.primary
-                        else Color.Transparent
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = backgroundColor),
-                        shape = CircleShape,
-                        border = BorderStroke(width = 1.dp, color = borderColor),
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(96.dp)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
+            if (state.presets.isEmpty()) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(128.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.no_presets),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            } else {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 32.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(128.dp)
+                ) {
+                    items(state.presets) { preset ->
+                        val backgroundColor =
+                            if (state.selectedPresetId == preset.id) MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceDim
+                        val borderColor =
+                            if (state.selectedPresetId == preset.id) MaterialTheme.colorScheme.primary
+                            else Color.Transparent
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = backgroundColor),
+                            shape = CircleShape,
+                            border = BorderStroke(width = 1.dp, color = borderColor),
                             modifier = Modifier
-                                .fillMaxSize()
-                                .clickable { viewModel.onPresetClicked(preset) }
+                                .padding(end = 8.dp)
+                                .size(96.dp)
                         ) {
-                            val formattedDuration =
-                                preset.duration.toComponents { hours, minutes, seconds, _ ->
-                                    "%02d:%02d:%02d".format(hours, minutes, seconds)
-                                }
-                            Text(text = formattedDuration)
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable { viewModel.onPresetClicked(preset) }
+                            ) {
+                                val formattedDuration =
+                                    preset.duration.toComponents { hours, minutes, seconds, _ ->
+                                        "%02d:%02d:%02d".format(hours, minutes, seconds)
+                                    }
+                                Text(text = formattedDuration)
+                            }
                         }
                     }
                 }
@@ -172,7 +187,9 @@ fun TimerInitScreen(
                         onHoursChanged = viewModel::onPresetHoursChanged,
                         onMinutesChanged = viewModel::onPresetMinutesChanged,
                         onSecondsChanged = viewModel::onPresetSecondsChanged,
-                        modifier = Modifier.semantics { contentDescription = presetDurationPickerContentDescription }
+                        modifier = Modifier.semantics {
+                            contentDescription = presetDurationPickerContentDescription
+                        }
                     )
                     Row(
                         horizontalArrangement = Arrangement.End,

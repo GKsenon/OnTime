@@ -5,6 +5,7 @@
     <string name="minutes_content_description">Minutes</string>
     <string name="seconds_content_description">Seconds</string>
     <string name="presets">Presets</string>
+    <string name="no_presets">No presets</string>
     <string name="create_preset">Create a preset</string>
     <string name="preset_duration_picker_content_description">Preset duration</string>
     <string name="stop">Stop</string>

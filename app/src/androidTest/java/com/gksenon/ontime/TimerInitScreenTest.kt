@@ -56,6 +56,7 @@ class TimerInitScreenTest {
     private lateinit var hoursContentDescription: String
     private lateinit var minutesContentDescription: String
     private lateinit var secondsContentDescription: String
+    private lateinit var noPresetsText: String
     private lateinit var startButtonText: String
     private lateinit var createPresetText: String
     private lateinit var presetDurationContentDescription: String
@@ -70,6 +71,7 @@ class TimerInitScreenTest {
             hoursContentDescription = stringResource(R.string.hours_content_description)
             minutesContentDescription = stringResource(R.string.minutes_content_description)
             secondsContentDescription = stringResource(R.string.seconds_content_description)
+            noPresetsText = stringResource(R.string.no_presets)
             startButtonText = stringResource(R.string.start)
             createPresetText = stringResource(R.string.create_preset)
             presetDurationContentDescription =
@@ -94,6 +96,7 @@ class TimerInitScreenTest {
             .onChildren()
             .filterToOne(hasText("00"))
             .assertIsDisplayed()
+        rule.onNodeWithText(noPresetsText).assertIsDisplayed()
         assert((windowManager.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) == 0)
     }
 
