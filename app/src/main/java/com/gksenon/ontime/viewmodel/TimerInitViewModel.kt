@@ -45,6 +45,30 @@ class TimerInitViewModel @Inject constructor(private val repository: TimerReposi
         _state.value = _state.value.copy(duration = preset.duration, selectedPresetId = preset.id)
     }
 
+    fun onPresetLongClicked(preset: Preset) {
+        _state.value = _state.value.copy(showEditPresetBottomSheet = true, presetInEdit = preset)
+    }
+
+    fun onEditPresetButtonClicked() {
+        _state.value.presetInEdit?.let { presetInEdit ->
+            _state.value = _state.value.copy(
+                showEditPresetBottomSheet = false,
+                showCreatePresetDialog = true,
+                presetDuration = presetInEdit.duration
+            )
+        }
+    }
+
+    fun onDeletePresetButtonClicked() {
+        val preset = _state.value.presetInEdit
+        _state.value = _state.value.copy(showEditPresetBottomSheet = false, presetInEdit = null)
+        if(preset != null) viewModelScope.launch { repository.deletePreset(preset) }
+    }
+
+    fun onPresetBottomSheetDismissed() {
+        _state.value = _state.value.copy(showEditPresetBottomSheet = false, presetInEdit = null)
+    }
+
     fun onCreatePresetButtonClicked() {
         _state.value = _state.value.copy(showCreatePresetDialog = true)
     }
@@ -66,12 +90,27 @@ class TimerInitViewModel @Inject constructor(private val repository: TimerReposi
 
     fun onCreatePresetDialogConfirmed() {
         val presetDuration = _state.value.presetDuration
-        viewModelScope.launch { repository.savePreset(presetDuration) }
-        _state.value = _state.value.copy(showCreatePresetDialog = false, presetDuration = 0.seconds)
+        val presetInEdit = _state.value.presetInEdit
+        _state.value = _state.value.copy(
+            showCreatePresetDialog = false,
+            presetInEdit = null,
+            presetDuration = 0.seconds
+        )
+        viewModelScope.launch {
+            if (presetInEdit != null) {
+                repository.editPreset(Preset(presetInEdit.id, presetDuration))
+            } else {
+                repository.savePreset(presetDuration)
+            }
+        }
     }
 
     fun onCreatePresetDialogDismissed() {
-        _state.value = _state.value.copy(showCreatePresetDialog = false, presetDuration = 0.seconds)
+        _state.value = _state.value.copy(
+            showCreatePresetDialog = false,
+            presetInEdit = null,
+            presetDuration = 0.seconds
+        )
     }
 
     fun onStartButtonClicked() {
@@ -89,6 +128,8 @@ class TimerInitViewModel @Inject constructor(private val repository: TimerReposi
         val duration: Duration = 0.seconds,
         val presets: List<Preset> = emptyList(),
         val selectedPresetId: UUID? = null,
+        val showEditPresetBottomSheet: Boolean = false,
+        val presetInEdit: Preset? = null,
         val showCreatePresetDialog: Boolean = false,
         val presetDuration: Duration = 0.seconds,
         val navigateToTimerInProgress: Boolean = false

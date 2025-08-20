@@ -10,11 +10,13 @@ import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performTouchInput
 import com.gksenon.ontime.domain.Preset
 import com.gksenon.ontime.ui.TimerInitScreen
 import com.gksenon.ontime.viewmodel.TimerInitViewModel
@@ -24,6 +26,7 @@ import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -62,6 +65,8 @@ class TimerInitScreenTest {
     private lateinit var presetDurationContentDescription: String
     private lateinit var okButtonText: String
     private lateinit var cancelButtonText: String
+    private lateinit var editPresetButtonText: String
+    private lateinit var deletePresetButtonText: String
     private lateinit var windowManager: Window
 
     @Before
@@ -78,6 +83,8 @@ class TimerInitScreenTest {
                 stringResource(R.string.preset_duration_picker_content_description)
             okButtonText = stringResource(android.R.string.ok)
             cancelButtonText = stringResource(android.R.string.cancel)
+            editPresetButtonText = stringResource(R.string.edit_preset)
+            deletePresetButtonText = stringResource(R.string.delete_preset)
             windowManager = (LocalContext.current as Activity).window
         }
     }
@@ -263,6 +270,53 @@ class TimerInitScreenTest {
         rule.onNodeWithText("01:30:25").performClick()
 
         assertEquals(presets.first(), presetSlot.captured)
+    }
+
+    @Test
+    fun onPresetLongClicked_opensBottomSheet() {
+        val presets = listOf(Preset(UUID.randomUUID(), 1.hours + 30.minutes + 25.seconds))
+        mockState.value = mockState.value.copy(presets = presets)
+
+        val presetSlot = slot<Preset>()
+        every { viewModel.onPresetLongClicked(capture(presetSlot)) } returns Unit
+
+        rule.onNodeWithText("01:30:25").performTouchInput { longClick() }
+
+        assertEquals(presets.first(), presetSlot.captured)
+    }
+
+    @Test
+    fun onPresetEditButtonClicked_opensEditDialog() = runTest {
+        val presets = listOf(Preset(UUID.randomUUID(), 1.hours + 30.minutes + 25.seconds))
+        mockState.value = mockState.value.copy(
+            presets = presets,
+            showEditPresetBottomSheet = true,
+            presetInEdit = presets.first()
+        )
+
+        every { viewModel.onEditPresetButtonClicked() } returns Unit
+
+        rule.onNodeWithText(editPresetButtonText).performClick()
+        rule.mainClock.advanceTimeBy(1000L)
+
+        verify { viewModel.onEditPresetButtonClicked() }
+    }
+
+    @Test
+    fun onPresetDeleteButtonClicked_deletesPreset() = runTest {
+        val presets = listOf(Preset(UUID.randomUUID(), 1.hours + 30.minutes + 25.seconds))
+        mockState.value = mockState.value.copy(
+            presets = presets,
+            showEditPresetBottomSheet = true,
+            presetInEdit = presets.first()
+        )
+
+        every { viewModel.onDeletePresetButtonClicked() } returns Unit
+
+        rule.onNodeWithText(deletePresetButtonText).performClick()
+        rule.mainClock.advanceTimeBy(1000L)
+
+        verify { viewModel.onDeletePresetButtonClicked() }
     }
 
     private fun getScrollPosition(max: Int, index: Int) =

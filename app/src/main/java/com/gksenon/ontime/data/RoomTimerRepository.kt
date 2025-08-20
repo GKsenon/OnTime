@@ -12,8 +12,16 @@ class RoomTimerRepository(val presetDao: PresetDao) : TimerRepository {
     override suspend fun savePreset(duration: Duration) =
         presetDao.savePreset(PresetEntity(id = UUID.randomUUID(), duration = duration))
 
+    override suspend fun editPreset(preset: Preset) =
+        presetDao.editPreset(preset.toEntity())
+
+    override suspend fun deletePreset(preset: Preset) =
+        presetDao.deletePreset(preset.toEntity())
+
     override fun getPresets(): Flow<List<Preset>> = presetDao.getPresets()
         .map { presets -> presets.map { preset -> preset.toPreset() } }
 
     private fun PresetEntity.toPreset() = Preset(id = id, duration = duration)
+
+    private fun Preset.toEntity() = PresetEntity(id = id, duration = duration)
 }

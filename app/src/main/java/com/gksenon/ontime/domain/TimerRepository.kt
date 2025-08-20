@@ -7,5 +7,9 @@ interface TimerRepository {
 
     suspend fun savePreset(duration: Duration)
 
+    suspend fun editPreset(preset: Preset)
+
+    suspend fun deletePreset(preset: Preset)
+
     fun getPresets(): Flow<List<Preset>>
 }

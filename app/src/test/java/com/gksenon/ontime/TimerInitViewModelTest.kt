@@ -232,4 +232,88 @@ class TimerInitViewModelTest {
         val state = viewModel.state.value
         assertTrue(state.navigateToTimerInProgress)
     }
+
+    @Test
+    fun onPresetLongClick_opensBottomSheet() = runTest {
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.showEditPresetBottomSheet)
+        assertEquals(presets.first(), state.presetInEdit)
+    }
+
+    @Test
+    fun onEditPresetButtonClicked_opensEditDialog() = runTest {
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        viewModel.onEditPresetButtonClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showEditPresetBottomSheet)
+        assertTrue(state.showCreatePresetDialog)
+        assertEquals(presets.first().duration, state.presetDuration)
+        assertEquals(presets.first(), state.presetInEdit)
+    }
+
+    @Test
+    fun onEditPresetDialogConfirmed_editsPreset() = runTest {
+        val presetSlot = slot<Preset>()
+        coEvery { repository.editPreset(capture(presetSlot)) } returns Unit
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        viewModel.onEditPresetButtonClicked()
+        viewModel.onPresetMinutesChanged(1)
+        viewModel.onCreatePresetDialogConfirmed()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showCreatePresetDialog)
+        assertEquals(null, state.presetInEdit)
+        assertEquals(0.seconds, state.presetDuration)
+        assertEquals(presets.first().copy(duration = 1.minutes + 30.seconds), presetSlot.captured)
+    }
+
+    @Test
+    fun onEditPresetDialogDismissed_closesEditDialog() = runTest {
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        viewModel.onEditPresetButtonClicked()
+        viewModel.onCreatePresetDialogDismissed()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showCreatePresetDialog)
+        assertEquals(0.seconds, state.presetDuration)
+        assertEquals(null, state.presetInEdit)
+    }
+
+    @Test
+    fun onDeletePresetButtonClicked_deletesPreset() = runTest {
+        val presetSlot = slot<Preset>()
+        coEvery { repository.deletePreset(capture(presetSlot)) } returns Unit
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        viewModel.onDeletePresetButtonClicked()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showEditPresetBottomSheet)
+        assertEquals(null, state.presetInEdit)
+        assertEquals(presets.first(), presetSlot.captured)
+    }
+
+    @Test
+    fun onPresetBottomSheetDismissed_hidesBottomSheet() = runTest {
+        val viewModel = TimerInitViewModel(repository)
+        viewModel.onPresetLongClicked(presets.first())
+        viewModel.onPresetBottomSheetDismissed()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.showEditPresetBottomSheet)
+        assertEquals(null, state.presetInEdit)
+    }
 }
