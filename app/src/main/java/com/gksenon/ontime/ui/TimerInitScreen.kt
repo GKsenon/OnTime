@@ -1,7 +1,15 @@
 package com.gksenon.ontime.ui
 
+import android.app.Activity
+import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -41,12 +50,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -62,7 +74,8 @@ import kotlin.time.Duration
 @Composable
 fun TimerInitScreen(
     viewModel: TimerInitViewModel = hiltViewModel(),
-    navigateToTimerInProgress: (Duration) -> Unit
+    navigateToTimerInProgress: (Duration) -> Unit,
+    navigateToZenModeSettings: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     Scaffold(
@@ -93,6 +106,30 @@ fun TimerInitScreen(
                     bottom = innerPadding.calculateBottomPadding() + 32.dp
                 )
         ) {
+            val isZenModeOn by rememberZenModeState()
+            if (!isZenModeOn) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = RoundedCornerShape(size = 16.dp)
+                        )
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.zen_mode_is_off),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = navigateToZenModeSettings) {
+                        Text(text = stringResource(R.string.turn_on_zen_mode))
+                    }
+                }
+            }
             DurationPicker(
                 duration = state.duration,
                 onHoursChanged = viewModel::onHoursChanged,
@@ -272,5 +309,33 @@ fun TimerInitScreen(
 
     LaunchedEffect(state.navigateToTimerInProgress) {
         if (state.navigateToTimerInProgress) navigateToTimerInProgress(state.duration)
+    }
+}
+
+@Composable
+fun rememberZenModeState(): State<Boolean> {
+    val activity = LocalContext.current as Activity
+    val notificationManager = activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+    fun NotificationManager.isZenModeOn() =
+        currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL
+
+    return produceState(notificationManager.isZenModeOn()) {
+        val interruptionFilterIntentFilter =
+            IntentFilter(NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED)
+        val interruptionFilterBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED) {
+                    value = notificationManager.isZenModeOn()
+                }
+            }
+        }
+
+        activity.registerReceiver(
+            interruptionFilterBroadcastReceiver,
+            interruptionFilterIntentFilter
+        )
+
+        awaitDispose { activity.unregisterReceiver(interruptionFilterBroadcastReceiver) }
     }
 }

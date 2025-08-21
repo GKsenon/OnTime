@@ -1,5 +1,6 @@
 package com.gksenon.ontime
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,15 +27,20 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController, startDestination = TimerInit) {
                     composable<TimerInit> {
-                        TimerInitScreen(navigateToTimerInProgress = { duration ->
-                            val navOptions = navOptions {
-                                popUpTo(TimerInit) { inclusive = true }
-                            }
-                            navController.navigate(
-                                route = TimerInProgress(duration.inWholeSeconds),
-                                navOptions = navOptions
-                            )
-                        })
+                        TimerInitScreen(
+                            navigateToTimerInProgress = { duration ->
+                                val navOptions = navOptions {
+                                    popUpTo(TimerInit) { inclusive = true }
+                                }
+                                navController.navigate(
+                                    route = TimerInProgress(duration.inWholeSeconds),
+                                    navOptions = navOptions
+                                )
+                            },
+                            navigateToZenModeSettings = {
+                                val intent = Intent("android.settings.ZEN_MODE_SETTINGS")
+                                startActivity(intent)
+                            })
                     }
                     composable<TimerInProgress> {
                         val navOptions = navOptions {
@@ -45,7 +51,10 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(route = TimerInit, navOptions = navOptions)
                             },
                             navigateToRingingScreen = {
-                                navController.navigate(route = TimerRinging, navOptions = navOptions)
+                                navController.navigate(
+                                    route = TimerRinging,
+                                    navOptions = navOptions
+                                )
                             }
                         )
                     }

@@ -11,6 +11,8 @@
     <string name="create_preset">Create a preset</string>
     <string name="edit_preset_dialog_title">Edit a preset</string>
     <string name="preset_duration_picker_content_description">Preset duration</string>
+    <string name="zen_mode_is_off">Do Not Disturb mode is off</string>
+    <string name="turn_on_zen_mode">Turn on</string>
     <string name="stop">Stop</string>
     <string name="turn_off">Turn off</string>
     <string name="time_ran_out">Time ran out!</string>
