@@ -29,11 +29,9 @@ class TimerInProgressViewModel @Inject constructor(savedStateHandle: SavedStateH
         tickerJob = viewModelScope.launch {
             ticker(duration).collect {
                 val remainingTime = _state.value.remainingTime - 1.seconds
-                _state.value = _state.value.copy(
-                    remainingTime = remainingTime,
-                    navigateToRinging = remainingTime <= 0.seconds
-                )
+                _state.value = _state.value.copy(remainingTime = remainingTime)
             }
+            _state.value = _state.value.copy(navigateToRinging = true)
         }
     }
 

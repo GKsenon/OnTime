@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -43,6 +44,18 @@ class TimerInProgressViewModelTest {
         assertEquals(90.seconds, state.remainingTime)
         assertFalse(state.navigateToRinging)
         assertFalse(state.navigateToInit)
+    }
+
+    @Test
+    fun givenDurationIsZero_navigatesToRinging() = runTest {
+        val savedStateHandleWithZeroDuration = SavedStateHandle().apply {
+            set("duration", 0L)
+        }
+        val viewModel = TimerInProgressViewModel(savedStateHandleWithZeroDuration)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state.navigateToRinging)
     }
 
     @Test
