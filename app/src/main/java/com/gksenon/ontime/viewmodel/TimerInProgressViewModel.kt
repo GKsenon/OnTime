@@ -3,6 +3,8 @@ package com.gksenon.ontime.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gksenon.ontime.domain.Flag
+import com.gksenon.ontime.domain.FlagsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -16,7 +18,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
-class TimerInProgressViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class TimerInProgressViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val flagRepository: FlagsRepository
+) : ViewModel() {
 
     private val duration = savedStateHandle.get<Long>("duration")?.seconds ?: 0.seconds
 
@@ -33,6 +38,16 @@ class TimerInProgressViewModel @Inject constructor(savedStateHandle: SavedStateH
             }
             _state.value = _state.value.copy(navigateToRinging = true)
         }
+        flagRepository.start()
+        viewModelScope.launch {
+            flagRepository.flags.collect { flags ->
+                _state.value = _state.value.copy(flags = flags)
+            }
+        }
+    }
+
+    fun onFlagButtonClicked() {
+        flagRepository.saveFlag()
     }
 
     fun onStopButtonClicked() {
@@ -51,6 +66,7 @@ class TimerInProgressViewModel @Inject constructor(savedStateHandle: SavedStateH
 
     data class State(
         val remainingTime: Duration = 0.seconds,
+        val flags: List<Flag> = emptyList(),
         val navigateToInit: Boolean = false,
         val navigateToRinging: Boolean = false
     )

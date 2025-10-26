@@ -14,6 +14,7 @@
     <string name="zen_mode_is_off">Do Not Disturb mode is off</string>
     <string name="turn_on_zen_mode">Turn on</string>
     <string name="stop">Stop</string>
+    <string name="timestamp">Create a timestamp</string>
     <string name="turn_off">Turn off</string>
     <string name="time_ran_out">Time ran out!</string>
 </resources>
