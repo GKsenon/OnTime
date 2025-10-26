@@ -1,12 +1,12 @@
 package com.gksenon.ontime.ui
 
-import android.app.Activity
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,10 +28,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -58,7 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -85,7 +81,7 @@ fun TimerInitScreen(
                 actions = {
                     IconButton(onClick = viewModel::onCreatePresetButtonClicked) {
                         Icon(
-                            imageVector = Icons.Default.Add,
+                            painter = painterResource(R.drawable.ic_add),
                             contentDescription = stringResource(R.string.create_preset)
                         )
                     }
@@ -226,7 +222,7 @@ fun TimerInitScreen(
                         .padding(16.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Edit,
+                        painter = painterResource(R.drawable.ic_edit),
                         contentDescription = stringResource(R.string.edit_preset)
                     )
                     Text(
@@ -246,7 +242,7 @@ fun TimerInitScreen(
                         .padding(16.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        painter = painterResource(R.drawable.ic_delete),
                         contentDescription = stringResource(R.string.delete_preset)
                     )
                     Text(
@@ -314,8 +310,8 @@ fun TimerInitScreen(
 
 @Composable
 fun rememberZenModeState(): State<Boolean> {
-    val activity = LocalContext.current as Activity
-    val notificationManager = activity.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    val activity = LocalActivity.current
+    val notificationManager = activity?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     fun NotificationManager.isZenModeOn() =
         currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_ALL

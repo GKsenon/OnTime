@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -15,8 +16,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class TimerRingingViewModelTest {
 
     @Before
@@ -31,8 +33,8 @@ class TimerRingingViewModelTest {
 
     @Test
     fun init_showsTimePassed() = runTest {
-        val viewModel = TimerRingingViewModel()
-        advanceTimeBy(500L)
+        val viewModel = TimerRingingViewModel(TestClock(testScheduler))
+        advanceTimeBy(0.5.seconds)
 
         val state = viewModel.state.value
         assertEquals(0.seconds, state.timePassed)
@@ -43,8 +45,8 @@ class TimerRingingViewModelTest {
 
     @Test
     fun onTimePassed_updatesTime() = runTest {
-        val viewModel = TimerRingingViewModel()
-        advanceTimeBy(1500L)
+        val viewModel = TimerRingingViewModel(TestClock(testScheduler))
+        advanceTimeBy(1.5.seconds)
 
         val state = viewModel.state.value
         assertEquals(1.seconds, state.timePassed)
@@ -54,9 +56,9 @@ class TimerRingingViewModelTest {
 
     @Test
     fun onTurnOffButtonClicked_navigatesToInit() = runTest {
-        val viewModel = TimerRingingViewModel()
+        val viewModel = TimerRingingViewModel(TestClock(testScheduler))
         viewModel.onTurnOffButtonClicked()
-        advanceTimeBy(500L)
+        advanceUntilIdle()
 
         val state = viewModel.state.value
         assertTrue(state.navigateToInit)

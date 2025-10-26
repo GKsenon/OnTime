@@ -3,6 +3,7 @@ package com.gksenon.ontime
 import android.app.Activity
 import android.view.Window
 import android.view.WindowManager
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
@@ -55,6 +56,7 @@ class TimerInitScreenTest {
         every { onCreatePresetButtonClicked() } returns Unit
     }
     private val navigateToTimerInProgress: (Duration) -> Unit = mockk()
+    private val navigateToZenModeSettings: () -> Unit = mockk()
 
     private lateinit var hoursContentDescription: String
     private lateinit var minutesContentDescription: String
@@ -72,7 +74,7 @@ class TimerInitScreenTest {
     @Before
     fun before() {
         rule.setContent {
-            TimerInitScreen(viewModel, navigateToTimerInProgress)
+            TimerInitScreen(viewModel, navigateToTimerInProgress, navigateToZenModeSettings)
             hoursContentDescription = stringResource(R.string.hours_content_description)
             minutesContentDescription = stringResource(R.string.minutes_content_description)
             secondsContentDescription = stringResource(R.string.seconds_content_description)
@@ -85,7 +87,7 @@ class TimerInitScreenTest {
             cancelButtonText = stringResource(android.R.string.cancel)
             editPresetButtonText = stringResource(R.string.edit_preset)
             deletePresetButtonText = stringResource(R.string.delete_preset)
-            windowManager = (LocalContext.current as Activity).window
+            windowManager = LocalActivity.current!!.window
         }
     }
 
