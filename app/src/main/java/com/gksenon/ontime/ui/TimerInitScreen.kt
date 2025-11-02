@@ -60,7 +60,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.gksenon.ontime.R
 import com.gksenon.ontime.viewmodel.TimerInitViewModel
 import kotlinx.coroutines.launch
@@ -69,7 +68,7 @@ import kotlin.time.Duration
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TimerInitScreen(
-    viewModel: TimerInitViewModel = hiltViewModel(),
+    viewModel: TimerInitViewModel,
     navigateToTimerInProgress: (Duration) -> Unit,
     navigateToZenModeSettings: () -> Unit
 ) {

@@ -1,6 +1,5 @@
 package com.gksenon.ontime.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gksenon.ontime.domain.Flag
@@ -19,18 +18,16 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class TimerInProgressViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val flagRepository: FlagsRepository
 ) : ViewModel() {
 
-    private val duration = savedStateHandle.get<Long>("duration")?.seconds ?: 0.seconds
-
-    private val _state = MutableStateFlow(State(duration))
+    private val _state = MutableStateFlow(State(0.seconds))
     val state = _state.asStateFlow()
 
     private var tickerJob: Job? = null
 
-    init {
+    fun start(duration: Duration) {
+        _state.value = State(duration)
         tickerJob = viewModelScope.launch {
             ticker(duration).collect {
                 val remainingTime = _state.value.remainingTime - 1.seconds

@@ -28,14 +28,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.gksenon.ontime.R
 import com.gksenon.ontime.viewmodel.TimerInProgressViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerInProgressScreen(
-    viewModel: TimerInProgressViewModel = hiltViewModel(),
+    viewModel: TimerInProgressViewModel,
     navigateToInitScreen: () -> Unit,
     navigateToRingingScreen: () -> Unit
 ) {

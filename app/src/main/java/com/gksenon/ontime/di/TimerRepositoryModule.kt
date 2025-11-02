@@ -1,7 +1,10 @@
-package com.gksenon.ontime.data
+package com.gksenon.ontime.di
 
 import android.content.Context
 import androidx.room.Room
+import com.gksenon.ontime.data.PresetDao
+import com.gksenon.ontime.data.RoomTimerDatabase
+import com.gksenon.ontime.data.RoomTimerRepository
 import com.gksenon.ontime.domain.TimerRepository
 import dagger.Module
 import dagger.Provides
